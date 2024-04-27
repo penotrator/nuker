@@ -9,21 +9,25 @@ from discord.ext import commands
 def load_config():
     with open("config.json") as f:
         config = json.load(f)
-        return config.get("PREFIX"), config.get("TOKEN"), config.get("HASH")
+        return config.get("PREFIX"), config.get("TOKEN"), config.get("VERSION")
 
 # # Defining main variables
 prefix, token, local_hash = load_config()
 
-def check_for_update():
+def check_for_update(local_hash):
     try:
         response = requests.get("https://raw.githubusercontent.com/penotrator/nuker/main/lib/config.json")
-        if response.status_code == 200 or response.status_code == 204:
-            remote_hash = response.text.strip()
-            return remote_hash == local_hash
+        if response.status_code == 200:
+            local_config = response.json()
+            remote_version = local_config.get("VERSION")
+            if remote_version:
+                return remote_version == local_hash
+            else:
+                pass
         else:
-            print(f"{Fore.RED}[-]{Fore.RESET} Failed to check for update. Status code: {response.status_code}")
+            pass
     except Exception as e:
-        print(f"{Fore.RED}[-]{Fore.RESET} Failed to check for update. Exception: {e}")
+        pass
 
     return False
 
@@ -145,8 +149,8 @@ async def on_guild_channel_create(channel):
         pass
 
 if __name__ == "__main__":
-    if check_for_update():
+    if check_for_update(local_hash):
         pass
     else:
-        print(f"{Fore.YELLOW}[!]{Fore.RESET} There is a newer version of the bot available. Please update.\n")
+        print(f"{Fore.YELLOW}[!]{Fore.RESET} There is a newer version of the script available. Please update.\n")
     bot.run(token)
