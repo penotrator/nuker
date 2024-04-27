@@ -139,9 +139,6 @@ async def on_guild_channel_create(channel):
     if thing == "True":
         for i in range(amount_of_nuker_messages_per_channel):
             try:
-                t = time.localtime()
-                # currenttime = time.strftime("%H:%M", t)
-                count = i + 1
                 print(f"{Fore.GREEN}[+]{Fore.RESET} Message sent {channel.id}")
                 await channel.send(message)
             except Exception as e:
