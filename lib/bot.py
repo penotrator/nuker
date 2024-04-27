@@ -16,7 +16,7 @@ prefix, token, local_hash = load_config()
 
 def check_for_update():
     try:
-        response = requests.get("https://raw.githubusercontent.com/penotrator/nuker/main/lib/hash")
+        response = requests.get("https://raw.githubusercontent.com/penotrator/nuker/main/lib/config.json")
         if response.status_code == 200 or response.status_code == 204:
             remote_hash = response.text.strip()
             return remote_hash == local_hash
