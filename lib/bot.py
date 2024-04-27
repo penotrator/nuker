@@ -152,5 +152,5 @@ if __name__ == "__main__":
     if check_for_update(local_hash):
         pass
     else:
-        print(f"{Fore.YELLOW}[!]{Fore.RESET} There is a newer version of the script available. Please update.\n")
+        print(f"{Fore.YELLOW}[!]{Fore.RESET} There is a newer version of the script available {Fore.YELLOW}https://github.com/penotrator/nuker{Fore.RESET}. Please update.\n")
     bot.run(token)
