@@ -131,7 +131,7 @@ async def setup_bot(ctx):
         await ctx.guild.create_text_channel(chan)
         if make_roles == "y":
             await ctx.guild.create_role(name=rolename)
-            print(f"{Fore.GREEN}[+]{Fore.RESET} Created role | {rolename}")
+    print()
 
 @bot.event
 async def on_guild_channel_create(channel):
@@ -139,6 +139,9 @@ async def on_guild_channel_create(channel):
     if thing == "True":
         for i in range(amount_of_nuker_messages_per_channel):
             try:
+                t = time.localtime()
+                # currenttime = time.strftime("%H:%M", t)
+                count = i + 1
                 print(f"{Fore.GREEN}[+]{Fore.RESET} Message sent {channel.id}")
                 await channel.send(message)
             except Exception as e:
